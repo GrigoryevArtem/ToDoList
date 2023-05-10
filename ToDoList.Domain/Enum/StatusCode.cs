@@ -2,6 +2,7 @@ namespace ToDoList.Domain.Enum;
 
 public enum StatusCode
 {
-    Ok = 200,
+    TaskIsHasAlready = 1,
+    OK = 200,
     InternalServerError = 500
 }
