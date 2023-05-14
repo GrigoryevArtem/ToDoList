@@ -10,6 +10,5 @@ public class TaskEntity
     public string Description { get; set; }
     public DateTime Created { get; set; }
     public Priority Priority { get; set; }
-
     public bool IsDone { get; set; }
 }
