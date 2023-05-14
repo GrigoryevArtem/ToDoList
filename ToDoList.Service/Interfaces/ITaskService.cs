@@ -9,5 +9,6 @@ public interface ITaskService
 {
     Task<IBaseResponse<TaskEntity>> Create(CreateTaskViewModel model);
     Task<IBaseResponse<IEnumerable<TaskViewModel>>> GetTasks(TaskFilter filter);
-    
+    Task<IBaseResponse<bool>> EndTask(long id);
+
 }
