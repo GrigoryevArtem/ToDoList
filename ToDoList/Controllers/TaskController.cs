@@ -29,4 +29,14 @@ public class TaskController : Controller
         }
         return BadRequest(new { description = response.Description });
     }
+
+    public async Task<IActionResult> TaskHandler()
+    {
+        var response = await _taskService.GetTasks();
+        if (response.StatusCode == Domain.Enum.StatusCode.OK)
+        {
+            return Json(data: response.Data);
+        }
+        return BadRequest(new { description = response.Description });
+    }
 }
