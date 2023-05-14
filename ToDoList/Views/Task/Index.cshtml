@@ -18,6 +18,21 @@
     <button id="createTask" class="btn btn-primary">Создать</button>
 </form>
 
+<br/>
+
+<div class="row">
+    <div class="form-group col-md-6">
+        <label class="col-form-label">Название</label>
+        <input name="nameTask" type ="text" class="form-control" />
+    </div>
+    <div class="form-group col-md-6">
+        <label class="col-form-label">Приоритет</label>
+        <select id="prioritySearch" class = "form-control mb-3" asp-items = "Html.GetEnumSelectList<Priority>()"></select>
+    </div>
+</div>
+
+<br/>
+
 <table class="table table-dark table-hover" id="taskTableId">
     <thead>
         <tr>
@@ -38,8 +53,59 @@
     <script>
       
       let dataTable = $('#taskTableId').DataTable({
-       
+          info: true,
+          serverSide: true,
+          searching: false,
+          paging: false,
+          sorting: false,
+          ajax:
+          {
+              url:'@Url.Action("TaskHandler")',
+              method: 'POST',
+              data: model
+          },
+          columns:[
+              {data: 'name'},
+              {data: 'priority'},
+              {data: 'description'},
+              {data: 'isDone'},
+              {
+                  data: null,
+                  sortable: false,
+                  render: function (data, type)
+                  {
+                      return '<button class="btn btn-success btn-sm center-block">Выполнить</button>'
+                  }
+              }
+          ],
+          createdRow: function(nRow, data) {
+            for (var i = 0; i < dataTable.columns().header().length - 1; i++)
+                {
+                    $('td', nRow).eq(i).css('cursor', 'pointer');
+                    $('td', nRow).eq(i).on('click', null);
+                }
+                 $('td button', nRow).eq(i).on('click', null);
+            
+          }
        });
+      
+      function model()
+      {
+          return {
+              Name: $('input[name="nameTask"]').val(),
+              Priority: $('#prioritySearch option:selected').val()
+          }
+      }
+      
+      $('input[name="nameTask"]').on('change', function ()
+      {
+          dataTable.draw();
+      });
+      
+      $('#prioritySearch').on('change', function ()
+      {
+          dataTable.draw();
+      });
     
         $('#createTask').on('click', function (e){
             e.preventDefault();

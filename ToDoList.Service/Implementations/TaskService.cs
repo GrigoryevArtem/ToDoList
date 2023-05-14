@@ -4,6 +4,7 @@ using ToDoList.DAL.Interfaces;
 using ToDoList.Domain.Entity;
 using ToDoList.Domain.Enum;
 using ToDoList.Domain.Extenstions;
+using ToDoList.Domain.Filters.Task;
 using ToDoList.Domain.Response;
 using ToDoList.Domain.ViewModels.Task;
 using ToDoList.Service.Interfaces;
@@ -73,19 +74,22 @@ public class TaskService : ITaskService
         }
     }
 
-    public async Task<IBaseResponse<IEnumerable<TaskViewModel>>> GetTasks()
+    public async Task<IBaseResponse<IEnumerable<TaskViewModel>>> GetTasks(TaskFilter filter)
     {
         try
         {
-            var tasks = await _taskRepository.GetAll().Select(x => new TaskViewModel
-            {
-                Id = x.Id,
-                Name = x.Name,
-                Description = x.Description,
-                IsDone = x.IsDone ? "Выполнена" : "Не выполнена",
-                Priority = x.Priority.GetDisplayName(),
-                Created = x.Created.ToLongDateString()
-            }).ToListAsync();
+            var tasks = await _taskRepository.GetAll()
+                .WhereIf(!string.IsNullOrWhiteSpace(filter.Name), x => x.Name == filter.Name)
+                .WhereIf(filter.Priority.HasValue, x => x.Priority == filter.Priority)
+                .Select(x => new TaskViewModel
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Description = x.Description,
+                    IsDone = x.IsDone ? "Выполнена" : "Не выполнена",
+                    Priority = x.Priority.GetDisplayName(),
+                    Created = x.Created.ToLongDateString()
+                }).ToListAsync();
 
             return new BaseResponse<IEnumerable<TaskViewModel>>()
             {
